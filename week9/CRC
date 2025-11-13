@@ -1,0 +1,28 @@
+# CRC-CCITT (16-bit) Error Detection
+
+def crc_ccitt(data, poly=0x1021, init=0xFFFF):
+    crc = init
+    for byte in data:
+        crc ^= (byte << 8)
+        for _ in range(8):
+            if crc & 0x8000:
+                crc = ((crc << 1) ^ poly) & 0xFFFF
+            else:
+                crc = (crc << 1) & 0xFFFF
+    return crc
+
+# Input data from user
+data = input("Enter data string: ").encode()
+
+# Sender side: compute CRC and append to data
+crc_value = crc_ccitt(data)
+print(f"CRC value (hex): {crc_value:04X}")
+
+# Simulate receiver side
+received_data = data
+check = crc_ccitt(received_data + crc_value.to_bytes(2, 'big'))
+
+if check == 0:
+    print("No error detected.")
+else:
+    print("Error detected in received data.")
