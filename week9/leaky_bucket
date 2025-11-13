@@ -1,0 +1,27 @@
+# Leaky Bucket Algorithm for Congestion Control
+
+bucket_size = int(input("Enter bucket size (in packets): "))
+output_rate = int(input("Enter output rate (packets/sec): "))
+n = int(input("Enter number of incoming packets: "))
+
+incoming_packets = [int(input(f"Enter size of packet {i+1}: ")) for i in range(n)]
+
+stored = 0  # current packets in bucket
+
+for i, packet in enumerate(incoming_packets, 1):
+    print(f"\nPacket {i}: {packet} packets arrive")
+
+    if packet + stored > bucket_size:
+        dropped = (packet + stored) - bucket_size
+        stored = bucket_size
+        print(f"Bucket overflow! Dropped {dropped} packets.")
+    else:
+        stored += packet
+        print(f"Bucket now has {stored} packets.")
+
+    # send packets out at output rate
+    sent = min(stored, output_rate)
+    stored -= sent
+    print(f"Sent {sent} packets. {stored} remain in bucket.")
+
+print(f"\nTransmission complete. {stored} packets left in bucket.")
