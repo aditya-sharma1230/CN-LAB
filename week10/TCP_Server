@@ -1,0 +1,36 @@
+import java.io.*;
+import java.net.*;
+
+class TCPserver {
+    public static void main(String args[]) throws Exception {
+
+        ServerSocket serSock = new ServerSocket(4000);
+        System.out.println("Server ready for connection...");
+
+        Socket sock = serSock.accept();
+        System.out.println("Connection established.");
+        System.out.println("Waiting for file name...");
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+        String fname = br.readLine();
+
+        PrintWriter pwrite = new PrintWriter(sock.getOutputStream(), true);
+        String str;
+
+        try {
+            BufferedReader contentRead = new BufferedReader(new FileReader(fname));
+            while ((str = contentRead.readLine()) != null) {
+                pwrite.println(str);
+            }
+            System.out.println("File content sent successfully.");
+            contentRead.close();
+        }
+        catch(FileNotFoundException e) {
+            pwrite.println("File not found at the server.");
+            System.out.println("File not found.");
+        }
+
+        sock.close();
+        serSock.close();
+    }
+}
